@@ -3,12 +3,11 @@ package com.userJwt.service;
 import com.userJwt.db.entity.User;
 import com.userJwt.Model.AuthenticationResponse;
 import com.userJwt.db.reposetory.UserRepo;
+import com.userJwt.exceptionHandlter.ResourceNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -46,7 +45,7 @@ public class AuthenticationService {
                         requUser.getPassword()
                 )
         );
-        User user = userRepo.findByUserName(requUser.getUsername()).orElseThrow();
+        User user = userRepo.findByUserName(requUser.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + requUser.getUsername()));
         String token  = jwtService.gernateTocken(user);
         return new AuthenticationResponse(token);
     }
