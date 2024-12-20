@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebSecurity
@@ -32,8 +33,10 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("/login/**","/register/**","/test**")
-                                .permitAll()
+                        req->req.requestMatchers("/login/**","/register/**","/test**").permitAll()//public apis
+                                .requestMatchers("/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
+                                .requestMatchers("/getUserDetails/**").authenticated() // Require JWT
+                                .requestMatchers("/getAllUserDetails/**").hasAuthority("ADMIN") //or has role
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(userDetailsService)
